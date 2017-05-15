@@ -7,11 +7,16 @@ b-cov
 *.pid
 *.gz
 *.idea
+fakeSessionStore.js
 
 pids
 logs
 results
 
+/build/
+
 node_modules
 npm-debug.log
 
+tags
+tags/*
