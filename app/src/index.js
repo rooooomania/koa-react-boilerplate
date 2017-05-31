@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom';
 import Request from 'superagent';
 import { isValidUrl } from '../../api/src/helper/urlParsseHelper';
+import { objectify } from '../../api/src/helper/utilities';
 
 class Login extends Component {
     onClickLogin(e) {
@@ -38,7 +39,7 @@ class Login extends Component {
                 }
 
                 const url = res.xhr.responseURL;
-                const restr = 'authz';
+                const restr = '[authz|rooooomania]';
                 if (url && isValidUrl(url, restr)) {
                     window.location.replace(url);
                 } else {
@@ -85,10 +86,14 @@ class AuthZ extends Component {
 
     onClickContent(e) {
         e.preventDefault();
-        // TODO: QueryString Parameter から RedirectEndpointとClientId を、Cookieから SessionKeyを取得する
 
-        const redirectEndpoint = 'http://rooooomania-markdown2textile-converter.s3-website-us-west-2.amazonaws.com/';
-        const clientId = '6fu6vegopk4ucpt4srv7cjk1i9';
+        // TODO: QueryString Parameter から RedirectEndpointとClientId を、Cookieから SessionKeyを取得する
+        const queryObj = objectify(this.props.location.search);
+        const redirectEndpoint = queryObj.redirectEndpoint;
+        const clientId = queryObj.clientId;
+
+        // const redirectEndpoint = 'http://rooooomania-markdown2textile-converter.s3-website-us-west-2.amazonaws.com/';
+        // const clientId = '6fu6vegopk4ucpt4srv7cjk1i9';
 
         Request
             .post('http://localhost:4000/authorization')

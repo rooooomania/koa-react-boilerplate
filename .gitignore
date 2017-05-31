@@ -8,12 +8,15 @@ b-cov
 *.gz
 *.idea
 fakeSessionStore.js
+.DS_Store
 
 pids
 logs
 results
 
 /build/
+build/
+build/*
 
 node_modules
 npm-debug.log
