@@ -1,13 +1,12 @@
-import SessionStore from '../dummy/fakeSessionStore';
-import { parseRequest, containedInWhitelist, isRegisterd } from '../helper/urlParsseHelper'
-import { WhiteList, ClientsIds } from '../dummy/fakeDatabase'
+import Database from '../helper/databaseHelper';
+import { parseRequest, containedInWhitelist, isRegisterd } from '../helper/urlParsseHelper';
+import { WhiteList, ClientsIds } from '../dummy/fakeDatabase';
 import * as authN from '../helper/authenticationHelper';
 
 // TODO: if hell をなんとかする
 
-function singin (){
+function signin (){
     return (method) => async (ctx, next) => {
-        const sessionMgr = SessionStore.getInstance();
         // console.log('inside signin', SessionStore.getInstance());
         let redirectEndpoint,
             clientId,
@@ -34,23 +33,24 @@ function singin (){
             break;
         }
 
-        const authorizationEndpoint = './authz';
+        const authorizationEndpoint = '/authz';
 
         if (checkPrecondition(clientId, redirectEndpoint, ctx)) {
 
-            // もしセッションキーがあれば、その情報を再利用できるか確認する
+            let session;
 
             const sessionKey = ctx.cookies.get('sessionKey');
-            const session = sessionMgr.getItem(sessionKey);
+            // もしセッションキーがあれば、その情報を再利用できるか確認する
             if (sessionKey) {
+                session = await Database.getItem(sessionKey);
                 if (session) {
-                    if (await authN.verifyUser(session.idtoken)) {
-                        const isContain = session.allowedClient.find(e => e === clientId);
+                    if (await authN.verifyUser(session.Item.idtoken)) {
+                        const isContain = session.Item.allowedClient.find(e => e === clientId);
 
                         console.log('isContain', isContain);
 
                         if (isContain) {
-                            return ctx.redirect(`${redirectEndpoint}?session=${session.id}`);
+                            return ctx.redirect(`${redirectEndpoint}?session=${session.Item.id}`);
                         }
                         // セッションが有効だが、当該クライアントアプリを許諾していないケース
                         // ここでは、同意確認画面へのリダイレクトを走らせる
@@ -64,7 +64,7 @@ function singin (){
             const tokenReceived = await authNUser((err, token) => {
                 if (err) {
                     ctx.status = 401;
-                    console.log('authN error occured!');
+                    console.log('authN error occured!', err);
                     return;
                 }
                 return token;
@@ -80,7 +80,7 @@ function singin (){
                         session,
                         {idtoken: tokenReceived}
                     );
-                    id = sessionMgr.updateItem(sessionWithNewToken);
+                    id = await Database.updateItem(sessionWithNewToken);
 
                     if (sessionWithNewToken.allowedClient) {
                         const isContain = sessionWithNewToken.allowedClient.find(e => e === clientId);
@@ -95,13 +95,17 @@ function singin (){
                 } else {
                     // 以降、初めてセッションを作るフロー
                     // セッションキーを発行し、エンドユーザを管理対象にする
-                    id = sessionMgr.putItem({
+                    const item = await Database.putItem({
                         idtoken: tokenReceived,
                         allowedClient: [],
-                    }).id;
-                    ctx.cookies.set('sessionKey', id);
+                    });
+                    if (item) {
+                        ctx.cookies.set('sessionKey', item.id);
+                    }
                 }
                 ctx.redirect(`${authorizationEndpoint}?clientId=${clientId}&redirectEndpoint=${redirectEndpoint}`);
+            } else {
+                ctx.status = 401;
             }
         }
 
@@ -109,12 +113,12 @@ function singin (){
     };
 }
 
-export function get (session) {
-    return singin(session)('GET');
+export function get () {
+    return signin()('GET');
 }
 
-export function post (session) {
-    return singin(session)('POST');
+export function post () {
+    return signin()('POST');
 }
 
 /*
@@ -125,8 +129,6 @@ export function post (session) {
  * @return {bool}
  */
 export function checkPrecondition (clientId, endpoint, ctx) {
-
-    console.log('clientID', clientId, endpoint);
 
     // Veiryfy the client id sent from app
     if (!isRegisterd(ClientsIds, clientId)) {

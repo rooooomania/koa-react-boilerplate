@@ -5,15 +5,12 @@ import koaCors from 'koa-cors';
 import Router from 'koa-router';
 import * as authN from './helper/authenticationHelper';
 import { pageNotFound } from './middlewares';
-import SessionStore from './dummy/fakeSessionStore';
+import Database from './helper/databaseHelper';
 import * as Signin from './route/signin';
 import views from 'koa-views';
 import serve from 'koa-static';
 import path from 'path';
 
-let sessionMgr = SessionStore.createInstance();
-
-console.log('SessionMgr initiated', sessionMgr);
 // Create API
 const router = Router();
 router
@@ -43,27 +40,26 @@ router
      * Cookieに含んだセッションキー(必須）を元に、同意情報を登録する。
      */
     .get('/authorization', async (ctx, next) => {
-        const sessionMgr = SessionStore.getInstance();
 
         const { clientId, redirectEndpoint } = ctx.query;
 
         // 通常ならセットされているセッションキーを確認し、その情報が有効かどうかを確認する
         const sessionKey = ctx.cookies.get('sessionKey');
         if (sessionKey) {
-            const session = sessionMgr.getItem(sessionKey);
-            if (session) {
-                if (await authN.verifyUser(session.idtoken)) {
+            const session = await Database.getItem(sessionKey);
+            if (session && session.Item) {
+                if (await authN.verifyUser(session.Item.idtoken)) {
                     //TODO: 同意済み情報をセッションに保持する
-                    const isContain = session.allowedClient.find(elm => elm === clientId);
+                    const isContain = session.Item.allowedClient.find(elm => elm === clientId);
                     if (!isContain) {
-                        sessionMgr.updateItem(
+                        Database.updateItem(
                             Object.assign(
-                                session,
-                                {allowedClient: [clientId].concat(session.allowedClient)},
+                                session.Item,
+                                {allowedClient: [clientId].concat(session.Item.allowedClient)},
                             )
                         );
                     }
-                    ctx.redirect(`${redirectEndpoint}?session=${session.id}`);
+                    ctx.redirect(`${redirectEndpoint}?session=${session.Item.id}`);
                     return;
                 }
             }
@@ -75,27 +71,26 @@ router
         next();
     })
     .post('/authorization', async (ctx, next) => {
-        const sessionMgr = SessionStore.getInstance();
 
         const { clientId, redirectEndpoint } = ctx.request.body;
 
         // 通常ならセットされているセッションキーを確認し、その情報が有効かどうかを確認する
         const sessionKey = ctx.cookies.get('sessionKey');
         if (sessionKey) {
-            const session = sessionMgr.getItem(sessionKey);
-            if (session) {
-                if (await authN.verifyUser(session.idtoken)) {
+            const session = await Database.getItem(sessionKey);
+            if (session && session.Item) {
+                if (await authN.verifyUser(session.Item.idtoken)) {
                     //TODO: 同意済み情報をセッションに保持する
-                    const isContain = session.allowedClient.find(elm => elm === clientId);
+                    const isContain = session.Item.allowedClient.find(elm => elm === clientId);
                     if (!isContain) {
-                        sessionMgr.updateItem(
+                        Database.updateItem(
                             Object.assign(
-                                session,
-                                {allowedClient: [clientId].concat(session.allowedClient)},
+                                session.Item,
+                                {allowedClient: [clientId].concat(session.Item.allowedClient)},
                             )
                         );
                     }
-                    ctx.redirect(`${redirectEndpoint}?session=${session.id}`);
+                    ctx.redirect(`${redirectEndpoint}?session=${session.Item.id}`);
                     return;
                 }
             }

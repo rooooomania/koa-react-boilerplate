@@ -12,7 +12,7 @@ import {
 
 import {ClientsById, ClientsIds} from '../src/dummy/fakeDatabase';
 
-describe('Given a RegExp', () => {
+xdescribe('Given a RegExp', () => {
     context('when the RegExp is null', () => {
         it('will result in "invalid"', () => {
             const url = 'yahoo.co.jp';
