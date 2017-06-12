@@ -25,6 +25,11 @@ router
         next();
     })
     .get('/authz', async (ctx, next) => {
+        // 通常ならセットされているセッションキーを確認し、その情報が有効かどうかを確認する
+        const sessionKey = ctx.cookies.get('sessionKey');
+        if (!sessionKey) {
+            return ctx.status = 401;
+        }
         await ctx.render('index');
         next();
     })

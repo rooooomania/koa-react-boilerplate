@@ -349,6 +349,7 @@ describe('GET /authz', () => {
         it('will return 200', async () => {
             await request
                 .get('/authz')
+                .set('Cookie', ['sessionKey=dummy'])
                 .expect(200);
         });
     });

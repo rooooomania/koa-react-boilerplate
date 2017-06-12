@@ -14,12 +14,12 @@ phases:
       - echo Build started on `date`
       - echo Compiling the Node.js code
       - npm test
-      - npm run webserverbuild
-      - npm run build
+#      - npm run webserverbuild
+#      - npm run build
   post_build:
     commands:
       - echo Build completed on `date`
-artifacts:
-  files:
-  discard-paths:
-  base-directory:
+#artifacts:
+#  files:
+#  discard-paths:
+#  base-directory:
