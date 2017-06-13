@@ -2,7 +2,7 @@
 test:
 	@NODE_ENV=test ./node_modules/.bin/mocha \
 	    --timeout 5000 \
-		--require babel-polyfill \
 		--compilers js:babel-register \
+		--require babel-polyfill \
 		--reporter spec \
 		./api/test/*.js
