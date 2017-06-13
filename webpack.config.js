@@ -6,7 +6,7 @@ const ROOT_PATH = path.resolve(__dirname);
 module.exports = {
     devtool: 'source-map',
     entry: [
-        'babel-polyfill',
+        // 'babel-polyfill',
         path.resolve(ROOT_PATH, 'app/src/index.js'),
     ],
     module: {
@@ -17,6 +17,7 @@ module.exports = {
                 loader: 'babel-loader',
                 query: {
                     presets: [
+                        'es2017',
                         'es2015',
                         'react'
                     ],
