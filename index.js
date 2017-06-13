@@ -5,6 +5,7 @@ const src = env === 'production' ? './api/build/server' : './api/src/server';
 console.warn(`the stage is ${env}...`);
 
 if (env === 'development') {
+  requrire('babel-polyfill');
   require ('babel-register');
 }
 

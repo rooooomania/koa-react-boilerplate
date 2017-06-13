@@ -6,6 +6,7 @@ const ROOT_PATH = path.resolve(__dirname);
 module.exports = {
     devtool: 'source-map',
     entry: [
+        'babel-polyfill'
         path.resolve(ROOT_PATH, 'app/src/index.js'),
     ],
     module: {
