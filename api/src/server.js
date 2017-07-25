@@ -1,5 +1,9 @@
 import Koa from 'koa';
-import koaLogger from 'koa-logger';
+const log4js = require('koa-log4');
+const logger = log4js.getLogger('app');
+log4js.configure('log4js.json');
+
+//import koaLogger from 'koa-logger';
 import koaBodyparser from 'koa-bodyparser';
 import koaCors from 'koa-cors';
 import Router from 'koa-router';
@@ -115,7 +119,8 @@ const publicPath = path.resolve(__dirname, '..');
 
 // Apply middlewares
 app
-    .use(koaLogger())
+    .use(log4js.koaLogger(log4js.getLogger("http"), { level: 'auto' }))
+//    .use(koaLogger())
     .use(koaCors({
         origin: true,
         credentials: true,
@@ -126,5 +131,13 @@ app
     .use(views(publicPath))
     .use(router.routes())
     .use(router.allowedMethods());
+
+// logger
+app.use(async (ctx, next) => {
+    const start = new Date();
+    await next();
+    const ms = new Date() - start;
+    logger.info(`${ctx.method} ${ctx.url} - ${ms}ms`);
+});
 
 export default app;
