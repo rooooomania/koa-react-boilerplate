@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "NODE_ENV=production node --harmony-async-await ./index.js",
     "test": "make test",
     "webserver": "npm run build && node --harmony-async-await ./index.js",
     "build": "node_modules/.bin/webpack --config webpack.config.js",
