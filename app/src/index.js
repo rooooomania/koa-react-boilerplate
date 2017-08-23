@@ -22,7 +22,7 @@ class Login extends Component {
     redirectEndpoint: ${redirectEndpoint}`);
 
         Request
-            .post('http://' + location.hostname + '/signin')
+            .post('http://' + location.hostname + ':' + location.port + '/signin')
             .withCredentials()
             .set('Content-type', 'application/x-www-form-urlencoded')
             .send({
@@ -96,7 +96,7 @@ class AuthZ extends Component {
         // const clientId = '6fu6vegopk4ucpt4srv7cjk1i9';
 
         Request
-            .post('http://' + location.hostname + '/authorization')
+            .post('http://' + location.hostname + ':' + location.port + '/authorization')
             .withCredentials()
             .set('Content-type', 'application/x-www-form-urlencoded')
             .set('Access-Control-Allow-Origin', '*')
