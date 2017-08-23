@@ -6,8 +6,8 @@ import {
     Link
 } from 'react-router-dom';
 import Request from 'superagent';
-import { isValidUrl } from '../../api/src/helper/urlParsseHelper';
-import { objectify, authHost } from '../../api/src/helper/utilities';
+const parseHelper =  require('../../api/build/helper/urlParsseHelper') ;
+const utilHelper = require('../../api/build/helper/utilities');
 
 class Login extends Component {
     onClickLogin(e) {
@@ -22,7 +22,7 @@ class Login extends Component {
     redirectEndpoint: ${redirectEndpoint}`);
 
         Request
-            .post(authHost + '/signin')
+            .post(utilHelper.authHost + '/signin')
             .withCredentials()
             .set('Content-type', 'application/x-www-form-urlencoded')
             .send({
@@ -40,7 +40,7 @@ class Login extends Component {
 
                 const url = res.xhr.responseURL;
                 const restr = '[authz|rooooomania]';
-                if (url && isValidUrl(url, restr)) {
+                if (url && parseHelper.isValidUrl(url, restr)) {
                     window.location.replace(url);
                 } else {
                     console.log('Invalid RedirectEndpoint.');
@@ -88,7 +88,7 @@ class AuthZ extends Component {
         e.preventDefault();
 
         // TODO: QueryString Parameter から RedirectEndpointとClientId を、Cookieから SessionKeyを取得する
-        const queryObj = objectify(this.props.location.search);
+        const queryObj = utilHelper.objectify(this.props.location.search);
         const redirectEndpoint = queryObj.redirectEndpoint;
         const clientId = queryObj.clientId;
 
@@ -96,11 +96,11 @@ class AuthZ extends Component {
         // const clientId = '6fu6vegopk4ucpt4srv7cjk1i9';
 
         Request
-            .post(authHost + '/authorization')
+            .post(utilHelper.authHost + '/authorization')
             .withCredentials()
             .set('Content-type', 'application/x-www-form-urlencoded')
             .set('Access-Control-Allow-Origin', '*')
-            .set('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
+            .set('Access-Control-AlutilHelper.low-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
             .set('Access-Control-Allow-Headers', 'Content-Type, Content-Range, Content-Disposition, Content-Description')
             .send({
                 redirectEndpoint: redirectEndpoint,
