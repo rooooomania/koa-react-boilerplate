@@ -55,6 +55,3 @@ function separateWithEqual(partOfQueryString) {
     };
 }
 
-export const authHost =
-    process.env.NODE_ENV === 'production'
-        ? 'https://auth.rooooomania.click': 'http://localhost:4000';
