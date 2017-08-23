@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 import Request from 'superagent';
 import { isValidUrl } from '../../api/src/helper/urlParsseHelper';
-import { objectify } from '../../api/src/helper/utilities';
+import { objectify, authHost } from '../../api/src/helper/utilities';
 
 class Login extends Component {
     onClickLogin(e) {
@@ -22,7 +22,7 @@ class Login extends Component {
     redirectEndpoint: ${redirectEndpoint}`);
 
         Request
-            .post('http://localhost:4000/signin')
+            .post(authHost + '/signin')
             .withCredentials()
             .set('Content-type', 'application/x-www-form-urlencoded')
             .send({
@@ -96,7 +96,7 @@ class AuthZ extends Component {
         // const clientId = '6fu6vegopk4ucpt4srv7cjk1i9';
 
         Request
-            .post('http://localhost:4000/authorization')
+            .post(authHost + '/authorization')
             .withCredentials()
             .set('Content-type', 'application/x-www-form-urlencoded')
             .set('Access-Control-Allow-Origin', '*')
